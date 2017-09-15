@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+   	<title> Day Tripper </title>
+   	<link rel = "stylesheet" href = "style.css" type = "text/css">
+   	<link href="https://fonts.googleapis.com/css?family=Fredericka+the+Great|Open+Sans+Condensed:300" rel="stylesheet">
+   	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBiwBBmkQT1eHCbIRi0gEmJG5rUSH5m99o&libraries=places"></script>
+
+   	 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script src = "script.js"></script>
+</head>
+<body>
+
+<div id = "title-area">
+<div id = "title">Day Tripper</div>
+<div id = "subtitle"> Get outside your comfort zone! </div>
+</div>
+
+<div id="googleMap"></div>
+
+
+<div id = "search-parameters">
+
+<div class = "search-section" id = "location">
+<div class = "section-title"> Step One: Pick Your Home Base </div>
+ <input class = "checkbox" type="checkbox" value="my-location" id = "my-location"> Use My Current Location<br>
+ <input class = "checkbox" type="checkbox"  value="another-location" id = "another-location"> Choose Another Location<br>
+<textarea id = "choose-location" placeholder = "Enter an Address or Zip Code"></textarea><div id = "location-search"> Search </div>
+</div>
+
+<div class = "search-section" id = "distances">
+<div class = "section-title"> Step Two: Pick Your Radius </div>
+I want to drive about
+<select id = "distance">
+  <option value="1">One hour</option>
+  <option value="2">Two Hours</option>
+  <option value="3">Three Hours</option>
+  <option value="4">Four Hours</option>
+</select>
+to get to my destination.
+</div>
+
+
+
+<div id = "final-search">Find Adventures!</div>
+
+</div>
+
+
+
+
+</body>
+</html>
+
+
+
+

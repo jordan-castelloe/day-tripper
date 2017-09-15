@@ -1,0 +1,66 @@
+*{
+	margin: auto;
+	text-align: left;
+	padding: 0.5em;
+	font-family: 'Open Sans Condensed', sans-serif;
+
+}
+
+#title-area{
+	background-color: #a2dba3;
+}
+
+#title, .section-title, #final-search{
+	font-family: 'Fredericka the Great', cursive;
+	text-align: center;
+}
+
+#title{
+	font-size: 400%;
+}
+
+
+#googleMap{
+	border-radius: 0.01em;
+	width: 40em;
+	height: 35em;
+	margin: 1em;
+	float: right;
+}
+
+#search-parameters{
+	font-size: 120%;
+}
+
+.search-section{
+	margin: 0.7em;
+}
+
+textarea, #location-search{
+	
+	height: 1.5em;
+	display: inline-block;
+	margin: 0.2em;
+}
+
+textarea{
+	width: 10em;
+	font-size: 0.8em;
+
+}
+
+#location-search{
+	vertical-align: top;
+}
+
+#final-search{
+	background-color: #a2dba3;
+	font-size: 200%;
+
+
+}
+
+
+
+
+
