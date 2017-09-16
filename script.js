@@ -11,6 +11,7 @@ var long;
 var newLat;
 var newLang;
 var radius;
+var distance;
 var LatLng;
 var points = [];
 var numberOfPoints = 20;
@@ -45,7 +46,7 @@ function error(err) {
 
 //print map 
 function showMap(){
-  location= {center:new google.maps.LatLng(lat, long), zoom : 12};
+  location= {center:new google.maps.LatLng(lat, long), zoom : 7};
   geocoder = new google.maps.Geocoder();
   map = new google.maps.Map(document.getElementById("googleMap"),location);
 };
@@ -54,25 +55,22 @@ function showMap(){
 //geolocate an address, convert to LatLng
 function codeAddress() {
     var address = $("#choose-location").val();
-    geocoder.geocode( { 'address': address}, function(results, status) {
+    geocoder.geocode( {'address': address}, function(results, status) {
       if (status == 'OK') {
         otherLocation = results[0];
+        lat = otherLocation.latitude;
+        long = otherLocation.longitude;
         map.setCenter(results[0].geometry.location);
-        var marker = new google.maps.Marker({
-            map: map,
-            position: results[0].geometry.location
-        });
       } else {
         alert('Geocode was not successful for the following reason: ' + status);
-      }
-    });
-  };
+      };
+      });
+    };
+ 
+
 
 
 function findCoordinates(lat, lang, radius){
-    console.log(lat);
-    console.log(lang);
-    console.log(radius);
     
     var degreesPerPoint = 360/numberOfPoints;
 
@@ -102,20 +100,19 @@ function findCoordinates(lat, lang, radius){
 function search(){
 service = new google.maps.places.PlacesService(map);
 for (var i = 0; i < numberOfPoints; i++){
-  console.log(points[i])
-service.nearbySearch({
+    service.nearbySearch({
     location: points[i],
-    radius: '1000',
-  }, callback);
+    radius: '5000',
+  }, searchCallback);
+  getDistance(points[i]);
 }
 }
 
 
 // if the search works, make markers for all the results
-function callback(results, status) {
+function searchCallback(results, status) {
   if (status === google.maps.places.PlacesServiceStatus.OK) {
     for (var i = 0; i < results.length; i++) {
-      console.log(results[i]);
       createMarker(results[i]);
     }
   }
@@ -138,7 +135,37 @@ function createMarker(place) {
       };
 
 
+function getDistance(destination){
+var origin = new google.maps.LatLng({lat: lat, lng: long});
+console.log(origin);
+var service = new google.maps.DistanceMatrixService();
+service.getDistanceMatrix(
+  {
+    origins: [origin],
+    destinations: [destination],
+    travelMode: 'DRIVING',
+    unitSystem: google.maps.UnitSystem.IMPERIAL,
+  }, getDistanceCallback);
+}
 
+function getDistanceCallback(response, status) {
+  if (status == 'OK') {
+    var origins = response.originAddresses;
+    var destinations = response.destinationAddresses;
+
+    for (var i = 0; i < origins.length; i++) {
+      var results = response.rows[i].elements;
+      for (var j = 0; j < results.length; j++) {
+        var element = results[j];
+        var distance = element.distance.text;
+        var duration = element.duration.text;
+        var from = origins[i];
+        var to = destinations[j];
+        console.log(duration);
+      }
+    }
+  }
+}
 
 
 
@@ -154,80 +181,39 @@ $("#final-search").click(function(){
 //set up starting location variable
 if ($("another-location").is(":checked")){
   codeAddress();
-};
+  location = otherLocation;
+} else {
+  location = myLocation;
+}
 
 //set up radius variable
-
-radius = $("#distance").val();
-if (radius == null){
+distance = $("#distance").val();
+if (distance == null){
   alert("Please choose a radius for your search!");
-}; 
-
+} else if (distance == 1){
+  radius = 0.7;
+} else if (distance == 2){
+  radius = 1.4;
+} else if (distance == 3){
+  radius = 1.8;
+} else if (distance == 4){
+  radius = 2.4;
+}
+ 
 findCoordinates(lat, long, radius);
 search();
-
 });
-
-
 });
 
  
 
-/*
 
 
 
 
 
-distance matrix key: AIzaSyDqK69kPXCV6qA1SA3RxvlHIx45CK73Rws
 
 
-var origin1 = new google.maps.LatLng(55.930385, -3.118425);
-var origin2 = 'Greenwich, England';
-var destinationA = 'Stockholm, Sweden';
-var destinationB = new google.maps.LatLng(50.087692, 14.421150);
-
-var service = new google.maps.DistanceMatrixService();
-service.getDistanceMatrix(
-  {
-    origins: [origin1, origin2],
-    destinations: [destinationA, destinationB],
-    travelMode: 'DRIVING',
-    transitOptions: TransitOptions,
-    drivingOptions: DrivingOptions,
-    unitSystem: UnitSystem,
-    avoidHighways: Boolean,
-    avoidTolls: Boolean,
-  }, callback);
-
-function callback(response, status) {
-  // See Parsing the Results for
-  // the basics of a callback function.
-}
-
-function callback(response, status) {
-  if (status == 'OK') {
-    var origins = response.originAddresses;
-    var destinations = response.destinationAddresses;
-
-    for (var i = 0; i < origins.length; i++) {
-      var results = response.rows[i].elements;
-      for (var j = 0; j < results.length; j++) {
-        var element = results[j];
-        var distance = element.distance.text;
-        var duration = element.duration.text;
-        var from = origins[i];
-        var to = destinations[j];
-      }
-
-    }
-  }
-}
-
-
-
-
-*/
 
 
 
