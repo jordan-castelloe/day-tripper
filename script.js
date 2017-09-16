@@ -115,6 +115,7 @@ service.nearbySearch({
 function callback(results, status) {
   if (status === google.maps.places.PlacesServiceStatus.OK) {
     for (var i = 0; i < results.length; i++) {
+      console.log(results[i]);
       createMarker(results[i]);
     }
   }
@@ -123,7 +124,6 @@ function callback(results, status) {
 
 //make a marker that shows the place name when you click on it
 function createMarker(place) {
-    var placeLoc = place.geometry.location;
     var marker = new google.maps.Marker({
           map: map,
           position: place.geometry.location
@@ -163,7 +163,7 @@ if (radius == null){
   alert("Please choose a radius for your search!");
 }; 
 
-findCoordinates(lat, long, 120);
+findCoordinates(lat, long, radius);
 search();
 
 });
