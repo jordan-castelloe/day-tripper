@@ -57,10 +57,11 @@ function codeAddress() {
     var address = $("#choose-location").val();
     geocoder.geocode( {'address': address}, function(results, status) {
       if (status == 'OK') {
-        otherLocation = results[0];
-        lat = otherLocation.latitude;
-        long = otherLocation.longitude;
         map.setCenter(results[0].geometry.location);
+        var marker = new google.maps.Marker({
+            map: map,
+            position: results[0].geometry.location
+        });
       } else {
         alert('Geocode was not successful for the following reason: ' + status);
       };
@@ -137,7 +138,6 @@ function createMarker(place) {
 
 function getDistance(destination){
 var origin = new google.maps.LatLng({lat: lat, lng: long});
-console.log(origin);
 var service = new google.maps.DistanceMatrixService();
 service.getDistanceMatrix(
   {
@@ -161,7 +161,7 @@ function getDistanceCallback(response, status) {
         var duration = element.duration.text;
         var from = origins[i];
         var to = destinations[j];
-        console.log(duration);
+  
       }
     }
   }
@@ -179,11 +179,11 @@ $("#location-search").click(function(){
 $("#final-search").click(function(){
 
 //set up starting location variable
-if ($("another-location").is(":checked")){
+if ($("another-location").prop("checked", true)){
   codeAddress();
-  location = otherLocation;
-} else {
-  location = myLocation;
+  var newCenter = map.getCenter();
+  lat = newCenter.lat();
+  long = newCenter.lng();
 }
 
 //set up radius variable
@@ -204,18 +204,3 @@ findCoordinates(lat, long, radius);
 search();
 });
 });
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
