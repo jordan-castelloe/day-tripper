@@ -5,15 +5,20 @@ var map;
 var infowindow;
 var location;
 var myLocation;
-var otherLocation;
 var lat;
 var long;
 var newLat;
-var newLang;
+var newLong;
 var radius;
 var distance;
 var LatLng;
 var points = [];
+var stores = [];
+var restaurants = [];
+var amusementParks = [];
+var parks = [];
+var museums = [];
+var zoos = [];
 var numberOfPoints = 20;
 
 
@@ -86,8 +91,8 @@ function findCoordinates(lat, lang, radius){
         var y2 = Math.sin(currentAngle) * radius;
 
       newLat= lat + x2;
-      newLang = lang + y2;
-      LatLng = new google.maps.LatLng({lat: newLat, lng: newLang}); 
+      newLong = lang + y2;
+      LatLng = new google.maps.LatLng({lat: newLat, lng: newLong}); 
     // save to our results array
       points.push(LatLng);
 
@@ -98,26 +103,151 @@ function findCoordinates(lat, lang, radius){
 
 
 //do a nearby search. We'll end up doing this for points generated with the findCoordiantes function
-function search(){
+function searchStores(){
 service = new google.maps.places.PlacesService(map);
 for (var i = 0; i < numberOfPoints; i++){
     service.nearbySearch({
     location: points[i],
     radius: '5000',
-  }, searchCallback);
+    type: ['store'],
+  }, searchStoresCallback);
+  getDistance(points[i]);
+}
+}
+
+// if the search works, make markers for all the results
+function searchStoresCallback(results, status) {
+  if (status === google.maps.places.PlacesServiceStatus.OK) {
+    for (var i = 0; i < results.length; i++) {
+      createMarker(results[i]);
+      stores.push(results[i]);
+
+    }
+  }
+}
+
+function searchRestaurants(){
+service = new google.maps.places.PlacesService(map);
+for (var i = 0; i < numberOfPoints; i++){
+    service.nearbySearch({
+    location: points[i],
+    radius: '5000',
+    type: ['restaurant'],
+  }, searchRestaurantsCallback);
   getDistance(points[i]);
 }
 }
 
 
 // if the search works, make markers for all the results
-function searchCallback(results, status) {
+function searchRestaurantsCallback(results, status) {
   if (status === google.maps.places.PlacesServiceStatus.OK) {
     for (var i = 0; i < results.length; i++) {
       createMarker(results[i]);
+      restaurants.push(results[i]);
+
     }
   }
 }
+
+function searchAmusementParks(){
+service = new google.maps.places.PlacesService(map);
+for (var i = 0; i < numberOfPoints; i++){
+    service.nearbySearch({
+    location: points[i],
+    radius: '5000',
+    type: ['amusement_park'],
+  }, searchAmusementParksCallback);
+  getDistance(points[i]);
+}
+}
+
+
+// if the search works, make markers for all the results
+function searchAmusementParksCallback(results, status) {
+  if (status === google.maps.places.PlacesServiceStatus.OK) {
+    for (var i = 0; i < results.length; i++) {
+      createMarker(results[i]);
+      amusementParks.push(results[i]);
+
+    }
+  }
+}
+
+function searchParks(){
+service = new google.maps.places.PlacesService(map);
+for (var i = 0; i < numberOfPoints; i++){
+    service.nearbySearch({
+    location: points[i],
+    radius: '5000',
+    type: ['park'],
+  }, searchParksCallback);
+  getDistance(points[i]);
+}
+}
+
+
+// if the search works, make markers for all the results
+function searchParksCallback(results, status) {
+  if (status === google.maps.places.PlacesServiceStatus.OK) {
+    for (var i = 0; i < results.length; i++) {
+      createMarker(results[i]);
+      parks.push(results[i]);
+
+    }
+  }
+}
+
+function searchMuseums(){
+service = new google.maps.places.PlacesService(map);
+for (var i = 0; i < numberOfPoints; i++){
+    service.nearbySearch({
+    location: points[i],
+    radius: '5000',
+    type: ['museum'],
+  }, searchMuseumsCallback);
+  getDistance(points[i]);
+}
+}
+
+
+// if the search works, make markers for all the results
+function searchMuseumsCallback(results, status) {
+  if (status === google.maps.places.PlacesServiceStatus.OK) {
+    for (var i = 0; i < results.length; i++) {
+      createMarker(results[i]);
+      museums.push(results[i]);
+
+    }
+  }
+}
+
+function searchZoos(){
+service = new google.maps.places.PlacesService(map);
+for (var i = 0; i < numberOfPoints; i++){
+    service.nearbySearch({
+    location: points[i],
+    radius: '5000',
+    type: ['zoo'],
+  }, searchZoosCallback);
+  getDistance(points[i]);
+}
+}
+
+
+// if the search works, make markers for all the results
+function searchZoosCallback(results, status) {
+  if (status === google.maps.places.PlacesServiceStatus.OK) {
+    for (var i = 0; i < results.length; i++) {
+      createMarker(results[i]);
+      zoos.push(results[i]);
+
+    }
+  }
+}
+
+
+
 
 
 //make a marker that shows the place name when you click on it
@@ -131,6 +261,7 @@ function createMarker(place) {
 
     google.maps.event.addListener(marker, 'click', function() {
     infowindow.setContent(place.name);
+      
     infowindow.open(map, this);
         });
       };
@@ -167,8 +298,6 @@ function getDistanceCallback(response, status) {
   }
 }
 
-
-
 // search for other locations
 $("#location-search").click(function(){
   codeAddress();
@@ -179,7 +308,9 @@ $("#location-search").click(function(){
 $("#final-search").click(function(){
 
 //set up starting location variable
-if ($("another-location").prop("checked", true)){
+if ($("#my-location").prop('checked', true)){
+  console.log(location);
+} else if ($("#another-location").prop('checked', true)){
   codeAddress();
   var newCenter = map.getCenter();
   lat = newCenter.lat();
@@ -201,6 +332,13 @@ if (distance == null){
 }
  
 findCoordinates(lat, long, radius);
-search();
+searchStores();
+searchRestaurants();
+searchAmusementParks();
+searchMuseums();
+searchParks();
+searchZoos();
+
+
 });
 });
