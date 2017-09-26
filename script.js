@@ -2,7 +2,6 @@ $(document).ready(function(){
 
 var geocoder;
 var map;
-var infowindow;
 var location;
 var myLocation;
 var lat;
@@ -13,18 +12,14 @@ var radius;
 var distance;
 var LatLng;
 var points = [];
-var stores = [];
-var restaurants = [];
-var amusementParks = [];
-var parks = [];
-var museums = [];
-var zoos = [];
+var places = [];
+var types = ["store", "restaurant", "amusement_park", "museum", "zoo"];
 var numberOfPoints = 20;
+var count;
 
 
 
 getLocation();
-
 
 
 //find the user's location
@@ -101,6 +96,142 @@ function findCoordinates(lat, lang, radius){
     };
 };
 
+
+function search(){
+
+var service = new google.maps.places.PlacesService(map);
+for (var i = 0; i < types.length; i++){
+  var typeValue = types[i];
+  placesSearch();
+
+
+function placesSearch(){
+for (var i = 0; i < numberOfPoints; i++){
+  var currentPoint = points[i];
+    service.nearbySearch({
+    location: currentPoint,
+    radius: '5000',
+    type: [typeValue],
+  }, placesSearchCallback);
+  getDistance(currentPoint);
+}
+}
+
+
+// if the search works, make markers for all the results
+function placesSearchCallback(results, status) {
+  if (status === google.maps.places.PlacesServiceStatus.OK) {
+    for (var i = 0; i < results.length; i++) {
+      var placeId = results[i].place_id;
+      createMarker(results[i]);
+      
+    }
+  }
+}
+}
+}
+
+
+
+function createMarker(place) {
+  var service = new google.maps.places.PlacesService(map);
+  var marker = new google.maps.Marker({
+          map: map,
+          position: place.geometry.location
+        });
+  var infowindow = new google.maps.InfoWindow();
+  google.maps.event.addListener(marker, 'click', function() {
+      var request = {
+                reference: place.reference
+            };
+            service.getDetails(request, function(details, status) {
+            infowindow.setContent([
+                details.name, 
+                details.formatted_address,
+                details.rating].join("<br />"))
+              infowindow.open(map, marker);
+            });
+          })
+      }
+
+
+
+function getDistance(destination){
+var origin = new google.maps.LatLng({lat: lat, lng: long});
+var service = new google.maps.DistanceMatrixService();
+service.getDistanceMatrix(
+  {
+    origins: [origin],
+    destinations: [destination],
+    travelMode: 'DRIVING',
+    unitSystem: google.maps.UnitSystem.IMPERIAL,
+  }, getDistanceCallback);
+}
+
+function getDistanceCallback(response, status) {
+  if (status == 'OK') {
+    var origins = response.originAddresses;
+    var destinations = response.destinationAddresses;
+
+    for (var i = 0; i < origins.length; i++) {
+      var results = response.rows[i].elements;
+      for (var j = 0; j < results.length; j++) {
+        var element = results[j];
+        var distance = element.distance.text;
+        var duration = element.duration.text;
+        var from = origins[i];
+        var to = destinations[j];
+  
+      }
+    }
+    return duration;
+  }
+}
+
+// search for other locations
+$("#location-search").click(function(){
+  codeAddress();
+});
+  
+
+// search for results
+$("#final-search").click(function(){
+
+//set up starting location variable
+if ($("#my-location").prop('checked', true)){
+  console.log(location);
+} else if ($("#another-location").prop('checked', true)){
+  codeAddress();
+  var newCenter = map.getCenter();
+  lat = newCenter.lat();
+  long = newCenter.lng();
+}
+
+//set up radius variable
+distance = $("#distance").val();
+if (distance == null){
+  alert("Please choose a radius for your search!");
+} else if (distance == 1){
+  radius = 0.7;
+} else if (distance == 2){
+  radius = 1.4;
+} else if (distance == 3){
+  radius = 1.8;
+} else if (distance == 4){
+  radius = 2.4;
+}
+ 
+findCoordinates(lat, long, radius);
+search();
+
+
+});
+});
+
+
+
+
+/*
 
 //do a nearby search. We'll end up doing this for points generated with the findCoordiantes function
 function searchStores(){
@@ -246,99 +377,4 @@ function searchZoosCallback(results, status) {
   }
 }
 
-
-
-
-
-//make a marker that shows the place name when you click on it
-function createMarker(place) {
-    var marker = new google.maps.Marker({
-          map: map,
-          position: place.geometry.location
-        });
-
-    infowindow = new google.maps.InfoWindow();
-
-    google.maps.event.addListener(marker, 'click', function() {
-    infowindow.setContent(place.name);
-      
-    infowindow.open(map, this);
-        });
-      };
-
-
-function getDistance(destination){
-var origin = new google.maps.LatLng({lat: lat, lng: long});
-var service = new google.maps.DistanceMatrixService();
-service.getDistanceMatrix(
-  {
-    origins: [origin],
-    destinations: [destination],
-    travelMode: 'DRIVING',
-    unitSystem: google.maps.UnitSystem.IMPERIAL,
-  }, getDistanceCallback);
-}
-
-function getDistanceCallback(response, status) {
-  if (status == 'OK') {
-    var origins = response.originAddresses;
-    var destinations = response.destinationAddresses;
-
-    for (var i = 0; i < origins.length; i++) {
-      var results = response.rows[i].elements;
-      for (var j = 0; j < results.length; j++) {
-        var element = results[j];
-        var distance = element.distance.text;
-        var duration = element.duration.text;
-        var from = origins[i];
-        var to = destinations[j];
-  
-      }
-    }
-  }
-}
-
-// search for other locations
-$("#location-search").click(function(){
-  codeAddress();
-});
-  
-
-// search for results
-$("#final-search").click(function(){
-
-//set up starting location variable
-if ($("#my-location").prop('checked', true)){
-  console.log(location);
-} else if ($("#another-location").prop('checked', true)){
-  codeAddress();
-  var newCenter = map.getCenter();
-  lat = newCenter.lat();
-  long = newCenter.lng();
-}
-
-//set up radius variable
-distance = $("#distance").val();
-if (distance == null){
-  alert("Please choose a radius for your search!");
-} else if (distance == 1){
-  radius = 0.7;
-} else if (distance == 2){
-  radius = 1.4;
-} else if (distance == 3){
-  radius = 1.8;
-} else if (distance == 4){
-  radius = 2.4;
-}
- 
-findCoordinates(lat, long, radius);
-searchStores();
-searchRestaurants();
-searchAmusementParks();
-searchMuseums();
-searchParks();
-searchZoos();
-
-
-});
-});
+*/

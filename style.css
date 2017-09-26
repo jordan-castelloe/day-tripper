@@ -25,27 +25,24 @@
 }
 
 
-#googleMap{
-	border-radius: 0.4em;
-	width: 30em;
-	height: 20em;
-	margin: 1em;
-	float: right;
-}
-
-
 #search-parameters, #intro{
 	font-size: 120%;
 }
 
 .search-section{
-	margin: 0.5em;
+	width: 22em;
+	height: 8em;
+	margin: 1em;
+	display: inline-block;
+	vertical-align: top;
 }
 
-textarea, #location-search{
-	height: 1.5em;
+
+#location-search{
 	display: inline-block;
+	height: 1.5em;
 	margin: 0.2em;
+	vertical-align: top;
 }
 
 textarea{
@@ -54,11 +51,16 @@ textarea{
 
 }
 
-#location-search{
-	vertical-align: top;
-}
+
 
 #final-search{
 	font-size: 200%;
+	margin: 0.5em;
 }
 
+#googleMap{
+	border-radius: 0.4em;
+	width: 80%;
+	height: 40em;
+	margin: auto;
+}
